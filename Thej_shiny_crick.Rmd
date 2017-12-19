@@ -1,0 +1,253 @@
+---
+title: "Application using Shiny"
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    theme: cerulean #theme
+---
+
+```{r}
+#theme http://rmarkdown.rstudio.com/flexdashboard/using.html#appearance
+library(flexdashboard)
+library(dplyr)
+library(ggplot2)
+```
+
+Sidebar {.sidebar}
+==============================
+
+```{r}
+fileInput(inputId = "meta_data",label = "Please Upload a csv File")
+uiOutput("dropdown_columns") #Used to display UIdropdown all columns after uploading
+#uiOutput("dropdown_numcolumns") #Used to display UIdropdown all columns after uploading
+#uiOutput("dropdown_catgcolumns") #Used to display UIdropdown all columns after uploading
+```
+
+EDA
+==================================
+Row
+----------------------------------
+
+```{r}
+### Upload file path details shown can upload only lessthan 5MB file
+#renderTable({input$meta_data})
+```
+
+### Uploaded Data details
+```{r}
+tableOutput("data_preview")
+```
+
+Row
+----------------------------------
+
+### Number of rows
+```{r}
+textOutput("nrows")
+```
+
+### Number of columns
+```{r}
+textOutput("ncols")
+```
+
+Row
+----------------------------------
+
+### Column Names
+```{r}
+tableOutput("colnames")
+```
+
+### Numeric Columns
+```{r}
+tableOutput("numericcolumns")
+```
+
+### Categorical Columns
+```{r}
+tableOutput("catogoricalcolumns")
+```
+
+Numerical Columns
+==================================
+
+Row {data-height=300}
+----------------------------------
+
+### Numeric columns Dropdown
+
+```{r}
+uiOutput("dropdown_numcolumns") #Used to display UIdropdown all columns after uploading
+```
+
+Row
+----------------------------------
+### Scatter Plot
+
+```{r}
+plotOutput("scatterplot")
+```
+
+Row
+----------------------------------
+
+### Histogram
+
+```{r}
+plotOutput("histogram")
+```
+
+### Boxplot
+
+```{r}
+plotOutput("boxplot")
+```
+
+Categorical Columns
+==================================
+
+
+Row {data-height=300}
+----------------------------------
+
+### Categorical columns Dropdowns
+
+```{r}
+uiOutput("dropdown_catgcolumns") #Used to display UIdropdown all columns after uploading
+```
+
+Row
+----------------------------------
+
+### Frequency Distribution
+
+```{r}
+tableOutput("freq_category") #Used to display dplyr table output
+```
+
+### Frequency Distribution for ggplot
+
+```{r}
+plotOutput("freq_categorys_plot") #Used to plot ggplot based on dplyr table data
+```
+
+Prediction
+==============================
+
+### Filters
+```{r}
+uiOutput("cluster_slider")
+```
+
+Row
+------------------------------
+
+### Kmeans ML Algorithm prediction
+```{r}
+tableOutput("cluster_table")
+```
+
+
+Decision Trees
+==============================
+
+Row
+------------------------------
+
+### Input Multiple Variables
+
+```{r}
+uiOutput("decision_inputs")
+```
+
+### Target Variable
+
+```{r}
+uiOutput("decision_target")
+```
+
+Row
+------------------------------
+
+```{r}
+textOutput("decision_tree")
+```
+
+
+```{r}
+observe({
+  if(is.null(input$meta_data))               
+    #checking the path is null or havin path
+ return(NULL)
+  #Retriving/reading data from path datapath
+  data=read.csv(input$meta_data$datapath)   
+  #Storing render data to data_preview
+  output$data_preview=renderTable(head(data)) 
+  #Number rows count
+  output$nrows=renderText(nrow(data))  
+  #Number columns count
+  output$ncols=renderText(ncol(data))    
+  #Columns Names
+  output$colnames=renderTable(names(data))
+  #Identifying Numeric and catagorical columns
+  nums <- sapply(data, is.numeric)            
+  numerics<-names(data)[nums]
+  output$numericcolumns=renderTable(names(data)[nums])       #retriving only Numeric columns
+  output$catogoricalcolumns=renderTable(names(data)[!nums])  #retriving only categorical columns
+  
+  #rendering the column dropdown at sidebar
+  output$dropdown_columns=renderUI(selectInput(inputId = "select_column",label = "Select a columns",choices=names(data)))
+  
+  #rendering the numeric column dropdown at sidebar 
+  output$dropdown_numcolumns=renderUI(selectInput(inputId = "select_numcolumn",label = "Select a numeric columns",choices=names(data)[nums],multiple = TRUE,selected =names(data)[nums][1] ))
+  
+  #rendering the categorical column dropdown at sidebar
+  output$dropdown_catgcolumns=renderUI(selectInput(inputId = "select_catgcolumn",label = "Select a Categorical columns",choices=names(data)[!nums]))
+  
+  #created a variable for boxplot for selected columns
+  output$boxplot=renderPlot(boxplot(data[,input$select_numcolumn]))
+  
+  #Created a variable for histogram for selected column
+  output$histogram=renderPlot(hist(data[,input$select_numcolumn[1]],xlab =input$select_numcolumn[1],main = "Histogram" ))
+  
+  #Using dplyr making table data and displaying in categorical
+  output$freq_category=renderTable(data%>%group_by_(input$select_catgcolumn)%>%summarise(count_item=n())%>%arrange(-count_item)%>%head(5))
+  
+  #Using dplyr and ggplot form a table and plot the bar chart
+  output$freq_categorys_plot=renderPlot({
+    items_data=data%>%group_by_(input$select_catgcolumn)%>%summarise(count_item=n())%>%arrange(-count_item)%>%head(5)
+    ggplot(items_data,aes_string(x=input$select_catgcolumn,y='count_item'))+geom_bar(stat = 'identity')
+    })
+  
+  #scatter plot based on selected numeric columns
+  output$scatterplot=renderPlot({ggplot(data,aes_string(x=input$select_numcolumn[1],y=input$select_numcolumn[2],col=input$select_column))+geom_point()})
+  
+  #Prediction dashboard for meachine learning algorithm K-means to predict
+  output$cluster_table =renderTable({
+    data_numeric=data[,numerics]
+    fit=kmeans(na.omit(data_numeric),centers = 5)
+    table(fit$cluster)
+  })
+  output$cluster_slider = renderUI({
+    sliderInput(inputId ="n_cluster",label = "choose number of clusters",min = 1,max = 15,value = 5)
+  })
+  
+  output$decision_inputs = renderUI({
+    selectInput(inputId = "independent_variables", label = "select input variables", choices = names(data),multiple = TRUE)
+  })
+  
+  output$decision_target = renderUI({
+    selectInput(inputId = "dependent_variable", label = "select input variable", choices = names(data))
+  })
+  output$decision_tree = renderText({
+    target = input$dependent_variable
+    inputs = paste(input$independent_variables,collapse = '+')
+    fit_eqn = paste(target, '~', inputs)
+  })
+  
+})
+```
+
