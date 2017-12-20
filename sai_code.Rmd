@@ -1,0 +1,63 @@
+---
+title: "Shiny_with_Flexdashboard_odi_year"
+runtime: shiny
+output: 
+ flexdashboard::flex_dashboard:
+   orientation: rows
+   vertical_layout: scroll
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+Odi_batting <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/odi-batting.csv")
+Odi_batting<-Odi_batting%>%mutate(Year= format(as.Date(Odi_batting$MatchDate,'%m-%d-%Y'),'%Y'),Century=if_else(Runs>=100,1,0))
+Odi_batting$Year<-as.numeric(Odi_batting$Year)
+uniqe_years<-sort(unique(Odi_batting$Year))
+
+```
+
+
+Sidebar {.sidebar}   
+==================================
+
+```{r}
+
+selectInput(inputId = "select_Year",label = "Select a Year",choices=uniqe_years)
+
+```
+
+Dash Boards
+==================================
+Row
+----------------------------------
+
+### Country - Total Runs {.text}
+
+```{r}
+renderPlot({Odi_batting%>%filter(Year==input$select_Year)%>%group_by(Country)%>%summarise(Total_runs=sum(Runs,na.rm=TRUE))%>%arrange(-Total_runs)%>%head(5)%>%ggplot(aes(reorder(x=Country,-Total_runs),y=Total_runs))+geom_bar(stat='identity')+xlab('Countries')+ylab('Total Runs')})
+
+```
+
+### Country - Total Players {.text}
+
+```{r}
+renderPlot({Odi_batting%>%filter(Year==input$select_Year)%>%group_by(Country)%>%summarise(Total_runs=length(unique(Player)))%>%arrange(-Total_runs)%>%head(5)%>%ggplot(aes(reorder(x=Country,-Total_runs),y=Total_runs))+geom_bar(stat='identity')+xlab('Countries')+ylab('Total Players')})
+
+```
+
+Row
+----------------------------------
+
+### Player - Total Runs {.text}
+
+```{r}
+renderPlot({Odi_batting%>%filter(Year==input$select_Year)%>%group_by(Player)%>%summarise(Total_runs=sum(Runs,na.rm=TRUE))%>%arrange(-Total_runs)%>%head(5)%>%ggplot(aes(reorder(x=Player,-Total_runs),y=Total_runs))+geom_bar(stat='identity')+xlab('Players')+ylab('Total Runs')})
+
+```
+
+### Player - Total Centuries {.text}
+
+```{r}
+renderPlot({Odi_batting%>%filter(Year==input$select_Year)%>%group_by(Player)%>%summarise(Total_Century=sum(Century))%>%arrange(-Total_Century)%>%head(5)%>%ggplot(aes(reorder(x=Player,-Total_Century),y=Total_Century))+geom_bar(stat='identity')+xlab('Players')+ylab('Total Countries')})
+```

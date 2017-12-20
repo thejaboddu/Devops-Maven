@@ -1,0 +1,65 @@
+---
+title: "4thday_2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+stocks <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/using_google sheets/sheet1.csv")
+stocks
+```
+
+```{r}
+library(plotly)
+library(ggplot2)
+library(dplyr)
+library(devtools)
+library(treemapify)
+
+```
+
+```{r}
+stocks$Date = as.Date(stocks$Date, "%d-%m-%y")
+stocks$month = format(stocks$Date, "%m")
+stocks$day = format(stocks$Date, "%d")
+
+```
+
+```{r}
+g= stocks %>% ggplot(aes(x=Date,y=Amazon)) + geom_bar(stat='identity')
+plot(g)
+```
+
+```{r}
+t <- stocks %>% ggplot(aes(x=Date,y=Ferrari)) + geom_line(group=1)
+plot(t)
+```
+
+```{r}
+View(stocks)
+```
+```{r}
+st <- ggplot(stocks,aes(x=day,y=month, fill=Ola)) +geom_tile()
+st
+```
+
+```{r}
+corrilation_v <- cor(select(stocks,c('Amazon','Tesla','Apple','Facebook','Ola','Ferrari')))
+corrilation_v
+
+```
+
+```{r}
+install.packages("corrplot")
+```
+
+```{r}
+library(corrplot)
+```
+
+```{r}
+corrplot(corrilation_v,method = "circle")
+```

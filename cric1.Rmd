@@ -1,0 +1,58 @@
+---
+title: "Cricket Dashboard"
+runtime: shiny
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+odi <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/odi-batting.csv")
+odi$MatchDate = as.Date(odi$MatchDate, format="%m-%d-%Y")
+odi$year = format(odi$MatchDate, "%Y")
+uniq_years = unique(odi$year)
+uniq_countries = unique(odi$Country)
+```
+
+Sidebar {.sidebar}
+========================================
+
+```{r}
+selectInput(inputId = "select_country", label = "select a country", choices = uniq_countries)
+selectInput(inputId = "select_year", label= "select a year", choices = uniq_years)
+```
+
+Dashboard 
+=======================================
+
+Row
+---------------------------------------
+
+### output
+
+```{r}
+renderPlot({
+  odi %>% filter(Country == input$select_country) %>% group_by(Player) %>% summarise(Runs=sum(Runs, na.rm = T)) %>% arrange(-Runs) %>% head(5) %>%
+  ggplot(aes(x=Player,y = Runs)) + geom_bar(stat = 'identity')
+  })
+
+```
+
+
+Row
+---------------------------------------
+
+### output9 {.text}
+
+```{r}
+renderText({input$select_year})
+```
+
+### output8 {.text}
+
+```{r}
+renderText({input$select_country})
+```
+

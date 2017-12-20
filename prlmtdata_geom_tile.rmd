@@ -1,0 +1,137 @@
+---
+title: "3rd day"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+title: "Assignment1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Parliment Data Set
+```{r}
+parliment <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/parliament.csv")
+parliment
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+# - For top ten parties compute the following metrics for the year 2009
+```{r}
+prty <- parliment %>% filter(YEAR==2009,Position==1) %>% group_by(PARTY) %>% summarize(com=n()) %>% arrange(desc(com)) %>% head(10) 
+prty
+
+```
+```{r}
+prty1 = prty$PARTY
+prty1
+
+topprty <- parliment %>% filter(PARTY %in% prty1)
+topprty
+```
+
+```{r Total number of contestants}
+cont <- topprty %>% filter(PARTY==prty1, YEAR==2009) %>% group_by(PARTY) %>% summarize(con=n())
+cont
+```
+
+```{r  - Total of number of winning seats}
+winn <- topprty %>% filter(YEAR==2009,Position==1) %>% group_by(PARTY) %>% summarize(win=n())
+winn
+```
+
+```{r - Avg. %of votes}
+
+per_vot <- topprty %>% filter(YEAR==2009) %>% group_by(PARTY) %>% summarize(VOTES=sum(VOTES)) %>% mutate(per=VOTES/sum(VOTES)*100)
+per_vot
+
+```
+
+- Identify top ten candidates with highest %margin of votes for the year 2009
+- Identify year wise percentage of male and female candidates?
+
+
+### ODI Batting
+- Create a new column by binning the Runs column using the following ranges and plot the frequency count of ranges
+  - 0-25, 26-50, 51-75, 76-100, 100+
+- Consider the top ten players by total runs and compute and visualize the number of centuries across years (use facet_grid or facet_wrap)
+
+### Tweets (#narendramodi)
+
+### Tweets(#flipkart)
+
+```{r}
+nowins <- parliment %>% group_by(YEAR,PARTY) %>% filter(Position==1,PARTY %in% prty1) %>% summarize(noofwins= n())
+nowins
+```
+
+```{r}
+ggplot(nowins,aes(x=PARTY,y=noofwins)) + geom_bar(stat = 'identity') + facet_wrap(~YEAR)
+```
+
+
+
+```{r}
+ggplot(nowins,aes(x=YEAR,y=noofwins)) + geom_bar(stat = 'identity') + facet_wrap(~PARTY)
+```
+
+```{r}
+nowins$YEAR = as.factor(nowins$YEAR)
+ggplot(nowins,aes(x=YEAR,y=PARTY, fill= -noofwins)) + geom_tile()
+```
+
+#top no of candidates wins
+```{r top can}
+can_win <- parliment %>% group_by(NAME,YEAR) %>% filter(Position==1) %>% summarize(nofwins = n()) %>% arrange(desc(nofwins)) %>% head(10)
+can_win
+```
+```{r}
+ggplot(can_win,aes(y=YEAR,x=NAME,fill=-nofwins)) + geom_tile()
+```
+
+```{r}
+top_candidate <- parliment %>% filter(Position==1) %>% group_by(NAME) %>% summarise(winsss = sum(Position)) %>% arrange(-winsss) %>% head(10)
+top_candidate
+```
+
+```{r}
+tp_cndt <- parliment %>% filter( NAME %in% top_candidate$NAME,Position==1) %>% group_by(YEAR,NAME) %>% summarize(wins = n())
+tp_cndt
+```
+
+```{r}
+tp_cndt$YEAR = as.factor(tp_cndt$YEAR)
+ggplot(tp_cndt,aes(x=YEAR,y=NAME,fill=-wins)) + geom_tile()
+```
+
+top 10 parites in karnataka no of wins for each party in each year
+```{r}
+kr_parties <- parliment %>% group_by(PARTY) %>% filter(STATE=="KARNATAKA",Position==1) %>% summarize(nwin = n()) %>% arrange(-nwin) %>% head(10)
+kr_parties
+```
+```{r}
+kr_10parties <- parliment %>% filter(STATE=="KARNATAKA", PARTY %in% kr_parties$PARTY,Position==1) %>% group_by(YEAR,PARTY) %>% summarize(nwins=n()) 
+kr_10parties
+```
+
+
+
+```{r}
+kr_10parties$YEAR = as.factor(kr_10parties$YEAR)
+ggplot(kr_10parties,aes(x=YEAR,y=PARTY,fill=-nwins)) + geom_tile()
+```
+
+```{r}
+
+```

@@ -1,0 +1,85 @@
+---
+title: "Application using Shiny"
+runtime: shiny
+output: 
+ flexdashboard::flex_dashboard:
+   orientation: rows
+   vertical_layout: scroll
+   theme: cerulean #theme
+---
+
+```{r}
+#theme http://rmarkdown.rstudio.com/flexdashboard/using.html#appearance
+library(flexdashboard)
+library(dplyr)
+library(ggplot2)
+```
+
+Sidebar {.sidebar}
+==============================
+
+```{r}
+fileInput(inputId = "meta_data",label = "Please Upload a csv File")
+uiOutput("dropdown_columns") #Used to display UIdropdown all columns after uploading
+#uiOutput("dropdown_numcolumns") #Used to display UIdropdown all columns after uploading
+#uiOutput("dropdown_catgcolumns") #Used to display UIdropdown all columns after uploading
+```
+
+EDA
+==================================
+Row
+----------------------------------
+
+```{r}
+### Upload file path details shown can upload only lessthan 5MB file
+#renderTable({input$meta_data})
+```
+
+### Uploaded Data details
+```{r}
+tableOutput("data_preview")
+```
+
+Row
+----------------------------------
+
+### Number of rows
+```{r}
+textOutput("nrows")
+```
+
+### Number of columns
+```{r}
+textOutput("ncols")
+```
+
+Row
+----------------------------------
+
+### Column Names
+```{r}
+tableOutput("colnames")
+```
+
+### Numeric Columns
+```{r}
+tableOutput("numericcolumns")
+```
+
+### Categorical Columns
+```{r}
+tableOutput("catogoricalcolumns")
+```
+
+```{r}
+observe({
+ if(is.null(input$meta_data))                #checking the path is null or havin path
+return(NULL)
+ data=read.csv(input$meta_data$datapath)     #Retriving/reading data from path datapath
+ output$data_preview=renderTable(head(data)) #Storing render data to data_preview
+ output$nrows=renderText(nrow(data))         #Number rows count
+ output$ncols=renderText(ncol(data))         #Number columns count
+ output$colnames=renderTable(names(data))    #Columns Names
+ nums <- sapply(data, is.numeric)            #Identifying Numeric and catagorical columns
+ numerics<-names(data)[nums]
+ output$numericcolumns=renderTable(names(data)[nums])       #retriving only Numeric columns

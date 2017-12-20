@@ -1,0 +1,106 @@
+---
+title: "Qwitter Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+twitter <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/narendramodi_tweets.csv")
+twitter
+```
+
+```{r}
+library(plotly)
+library(ggplot2)
+library(dplyr)
+library(devtools)
+library(treemapify)
+library(knitr)
+library(stringi)
+library(stringr)
+```
+
+
+```{r}
+filename <- "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/tweets.txt"
+filename
+```
+
+```{r}
+article <- readChar(filename,file.info(filename)$size)
+article
+```
+```{r}
+words_all <- unlist(str_split(article, ' '))
+words_freq <- as.data.frame(table(words_all))
+words_top <- words_freq %>% arrange(-Freq) %>% head(50)
+View(words_top)
+```
+
+```{r}
+install.packages("wordcloud")
+```
+
+```{r}
+library(wordcloud)
+```
+```{r}
+wordcloud(words_top$words_all,words_top$Freq)
+```
+
+```{r}
+install.packages("tm")
+library(tm)
+```
+
+```{r}
+sw <- stopwords()
+sw
+length(sw)
+```
+
+```{r}
+words_top <- words_freq %>% filter(!words_all %in% sw) %>% arrange(-Freq) %>% head(50)
+wordcloud(words_top$words_all,words_top$Freq)
+```
+
+```{r}
+twitter <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/narendramodi_tweets.csv")
+twitter$text = as.character(twitter$text)
+twitter$text = tolower(twitter$text)
+```
+
+```{r}
+twitter$text <- gsub('[^a-z] ','',twitter$text)
+head(twitter$text)
+
+```
+```{r}
+words_all <- unlist(str_split(twitter$text,' '))
+length(words_all)
+```
+
+
+```{r}
+words_freq = as.data.frame(table(words_all))
+names(words_freq)
+words_top <- words_freq %>% filter(!words_all %in% sw) %>% arrange(-Freq) %>% head(50)
+wordcloud(words_top$words_all,words_top$Freq)
+```
+
+
+```{r}
+install.packages("RColorBrewer")
+```
+
+```{r}
+library(RColorBrewer)
+```
+
+```{r}
+pal2 <- brewer.pal(8,"Dark2")
+wordcloud(words_top$words_all,words_top$Freq,colors = pal2)
+```

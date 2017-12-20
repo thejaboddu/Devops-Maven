@@ -1,0 +1,45 @@
+---
+title: "od"
+author: "Theja"
+date: "30 November 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggmap)
+library(gganimate)
+library(dplyr)
+library(devtools)
+library(animation)
+library(gapminder)
+library(ggplot2)
+```
+
+```{r}
+odi <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/odi.csv")
+odi$Country <- as.character(odi$Country)
+country <- unique(odi$Country)
+country_code <- geocode(country)
+
+geocode_state <- cbind(country,country_code)
+head(geocode_state, n=50)
+```
+
+```{r}
+```{r geting map }
+parliament$STATE=as.character(parliament$STATE)
+state=unique(parliament$STATE)
+state_code=geocode(state)
+
+geocode_state=cbind(state,state_code)
+head(geocode_state)
+#write.csv(geocode_state,"geocode_state.csv",row.names = FALSE) 
+# In csv file concatenate lat and long by (=concatenate(c2,",",b2)) then copy the whole column and paste in the plotmap points field in darrinward.com/lat-long, and get the map
+```
+
+
+

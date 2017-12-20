@@ -1,0 +1,57 @@
+---
+title: "4th day"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("devtools")
+```
+
+
+
+```{r}
+cricket <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/updated_odi_batting.csv")
+cricket
+```
+
+```{r}
+library(ggplot2)
+library(plotly)
+library(scales)
+library(treemapify)
+library(devtools)
+library(dplyr)
+```
+```{r}
+indian_player_summary <- cricket %>% filter(Country=="India") %>% group_by(Player) %>% summarize(Totalruns=sum(Runs,na.rm=TRUE),Avg_sr=mean(ScoreRate,na.rm = TRUE)) %>% arrange(-Totalruns) %>% head(50)
+indian_player_summary
+```
+
+```{r}
+tj <- ggplot(indian_player_summary,aes(area= Totalruns,label = Player, fill=-Avg_sr)) + geom_treemap()
+tj <- tj+geom_treemap_text()
+plot(tj)
+```
+
+```{r}
+x = c(100,10,0,60,90)
+rescale(x,c(-1,1))
+mean(x)
+max(indian_player_summary$Avg_sr)
+```
+
+```{r}
+indian_player_summary$Avg_sr_scaled <- rescale(indian_player_summary$Avg_sr,c(-1,1))
+View(indian_player_summary)
+
+```
+
+```{r}
+tj <- ggplot(indian_player_summary,aes(area= Totalruns,label = Player, fill=-Avg_sr_scaled)) + geom_treemap()
+tj = tj+geom_treemap_text() + scale_fill_gradient2(low="red",mid = "#04A5F0",high="#81BB05")
+plot(tj)
+```

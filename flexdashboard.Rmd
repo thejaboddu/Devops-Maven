@@ -1,0 +1,65 @@
+---
+title: "Cricket_Analysis"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+```
+
+Row
+----------------------------------------------
+### Top 10 Countries based on total Runs
+
+
+```{r}
+cricket <- read.csv (file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/updated_odi_batting.csv")
+
+top10countries <- cricket %>% group_by(Country) %>% summarise(totalruns= sum(Runs,na.rm = TRUE)) %>% arrange(-totalruns) %>% head(10)
+
+g1 <- ggplot(top10countries,aes(x=reorder(Country,-totalruns),y=totalruns,colour='blue')) + geom_bar(stat = 'identity') + xlab('Country') + ylab('totalruns')
+ggplotly(g1)
+
+```
+
+Row
+----------------------------------------------
+### Top 10 Countries based on total players
+
+```{r}
+
+top10players <- cricket %>% group_by(Country) %>% summarize(totalplayers = n()) %>% arrange(-totalplayers) %>% head(10)
+
+
+g2 <- ggplot(top10players,aes(x=reorder(Country,-totalplayers),y=totalplayers,color='#FB5821')) + geom_bar(stat = 'identity') + xlab('Country') + ylab('totalplayers')
+ggplotly(g2)
+```
+
+
+
+
+
+
+Row
+---------------------------------------------
+### Chart C
+
+### Chart D
+
+
+
+
+Row
+---------------------------------------------
+### Chart E
+
+### Chart F
+
+
+

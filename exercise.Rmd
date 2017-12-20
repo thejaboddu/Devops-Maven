@@ -1,0 +1,76 @@
+---
+title: "Cricket_Classwork"
+runtime: shiny
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(flexdashboard)
+library(shiny)
+library(shinydashboard)
+library(lubridate)
+```
+
+```{R}
+odi <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/odi-batting.csv")
+odi$MatchDate = as.Date(odi$MatchDate, format="%m-%d-%Y")
+odi$year = format(odi$MatchDate, "%Y")
+uniq_years = sort(unique(as.numeric(odi$year)))
+uniq_countries = unique(odi$Country)
+```
+
+Sidebar {.sidebar}
+========================================
+```{r}
+selectInput(inputId = "select_year", label= "select a year", choices = uniq_years)
+```
+
+
+
+Dashboard 
+=======================================
+
+Row
+---------------------------------------------
+### Country - Total Runs
+
+```{r}
+renderPlot({
+   odi%>% filter(year==input$select_year) %>% group_by(Country)%>%summarise(Runs=length(unique(Runs)))%>%arrange(-Runs)%>%head(5)%>%ggplot(aes(x=Country,y=Runs))+geom_bar(stat='identity')+xlab("Country")+ylab("Runs")})
+```
+
+
+### Country - Total Players
+
+```{r}
+renderPlot({
+   odi%>% filter(year==input$select_year) %>% group_by(Country)%>%summarise(players=length(unique(Player)))%>%arrange(-players)%>%head(5)%>%ggplot(aes(x=reorder(Country,-players),y=players))+geom_bar(stat='identity')+xlab("Country")+ylab("TotalPlayers")
+})
+```
+
+
+
+Row
+---------------------------------------------
+### Player - Total Runs
+
+```{r}
+renderPlot({
+   odi%>% filter(year==input$select_year) %>% group_by(Player)%>%summarise(Runs=length(unique(Runs)))%>%arrange(-Runs)%>%head(5)%>%ggplot(aes(x=Player,y=Runs))+geom_bar(stat='identity')+xlab("Country")+ylab("Runs")
+})
+```
+
+
+### Player - Total Centuries
+
+```{r}
+names(odi)
+sapply(odi, is,numeric)
+names(odi)[TRUE, FALSE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE]
+```
+
+

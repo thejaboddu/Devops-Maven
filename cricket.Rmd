@@ -1,0 +1,58 @@
+---
+title: "Cricket Dashboard"
+runtime: shiny
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r}
+odi <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/odi.csv")
+uniq_countries = unique(odi$Country)
+```
+
+Sidebar {.sidebar}
+========================================
+```{r}
+textInput(inputId = "text_name", label = "Enter Text Here")
+selectInput(inputId = "select_country", label = "Select a country", choices = c('India','Australia','USA'))
+dateInput(inputId = "start_date",label = "select starting date", startview = "year")
+sliderInput(inputId = "select_bin",label = "select a bin",min = 0,max = 10,value = 6)
+```
+
+
+Dashboard 
+=======================================
+
+Row
+---------------------------------------
+
+### Text_name {.text}
+
+```{r}
+renderText({input$text_name})
+```
+
+### Country {.text}
+
+```{r}
+renderText({input$select_country})
+```
+
+Row
+-------------------------------------
+### Bin {.text}
+
+```{r}
+renderText({input$select_bin})
+```
+
+### Date {.text}
+
+```{r}
+renderText({input$start_date})
+```
+
+
+
+

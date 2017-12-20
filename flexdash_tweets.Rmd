@@ -1,0 +1,94 @@
+---
+title: "Untitled"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+```{r}
+library(flexdashboard)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(wordcloud)
+```
+```{r}
+#install.packages("wordcloud")
+```
+
+
+```{r}
+tweets <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/narendramodi_tweets.csv")
+```
+
+Row
+-----------------------------------------------------------------------
+### Followers
+
+```{r}
+valueBox(10000, icon="fa-pencil",color = "#7EE555")
+
+```
+
+
+### Friends
+
+```{r}
+valueBox(20000, icon="fa-users", color = "#FF5300")
+```
+
+
+### Tweets
+
+```{r}
+valueBox(30000, icon="fa-retweet",color = "#EAF14B")
+```
+
+
+
+
+
+Row
+-----------------------------------------------------------------------
+### Chart D
+```{r}
+g = ggplot(tweets,aes(x=retweets_count,y=favorite_count,color=source))+ geom_point()+xlab('Retweets')+ylab('Likes')
+ggplotly(g)
+```
+
+
+
+
+
+
+
+Row
+-----------------------------------------------------------------------
+### Chart E
+
+```{r}
+tweets$text = as.character(tweets$text)
+words_freq <- table(unlist(strsplit(tweets$text, ' ')))
+words_freq <- as.data.frame(words_freq)
+names(words_freq) = c('words', 'freq')
+head(words_freq)
+words_top <- words_freq %>% arrange(-freq) %>% head(150)
+wordcloud(words_top$words,words_top$freq, colors = words_top$freq)
+
+```
+
+
+### Trneding Hash Tag
+```{r}
+hashtag_words <- words_freq[startsWith(as.character(words_freq$words), '#'),]
+hashtag_words_top <- hashtag_words %>% arrange(-freq) %>% head(50)
+wordcloud(hashtag_words_top$words,hashtag_words_top$freq,colors = hashtag_words_top$freq)
+```
+
+
+

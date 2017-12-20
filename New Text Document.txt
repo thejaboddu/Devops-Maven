@@ -1,0 +1,2 @@
+renderPlot({odi %>% (year == input$select_year) %>% group_by(Country) %>% summarize(totalplayers = n()) %>% arrange(-totalplayers) %>% head(10) %>% ggplot(aes(x= Country , y = totalplayers)) + geom_bar(stat = 'identity')
+  })

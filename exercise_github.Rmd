@@ -1,0 +1,82 @@
+---
+title: "Excercise-1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+parliment <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/parliament.csv")
+parliment 
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+# - For top ten parties compute the following metrics for the year 2009
+```{r}
+prty <- parliment %>% filter(YEAR==2009,Position==1) %>% group_by(PARTY) %>% summarize(com=n()) %>% arrange(desc(com)) %>% head(10) 
+prty
+
+prty1 = prty$PARTY
+prty1
+
+topprty <- parliment %>% filter(PARTY %in% prty1)
+topprty
+```
+
+```{r Total number of contestants}
+cont <- topprty %>% filter(PARTY==prty1, YEAR==2009) %>% group_by(PARTY) %>% summarize(con=n())
+cont
+```
+
+```{r  - Total of number of winning seats}
+winn <- topprty %>% filter(YEAR==2009,Position==1) %>% group_by(PARTY) %>% summarize(win=n())
+winn
+```
+
+```{r - Avg. %of votes}
+
+per_vot <- topprty %>% filter(YEAR==2009) %>% group_by(PARTY) %>% summarize(VOTES=sum(VOTES)) %>% mutate(per=VOTES/sum(VOTES)*100)
+per_vot
+
+```
+
+- Identify top ten candidates with highest %margin of votes for the year 2009
+- Identify year wise percentage of male and female candidates?
+
+ODI Batting
+```{r}
+cricket <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/updated_odi_batting.csv")
+cricket 
+```
+
+Create a new column by binning the Runs column using the following ranges and plot the frequency count of ranges
+0-25, 26-50, 51-75, 76-100, 100+
+```{r}
+cricket <- cricket %>% mutate(binning=if_else(Runs>=0 &))
+```
+
+Consider the top ten players by total runs and compute and visualize the number of centuries across years (use facet_grid or facet_wrap)
+Compute total number of breaks taken by each player and identify top five players. (Note: A break is considered, if a player has not played any match in a year)
+For top ten players (based on total runs) compute the following metrics
+Total runs
+Total centuries
+Total Fifties
+Total Ducks
+Total experience in terms of number of years they have played
+Tweets (#narendramodi)
+
+Monthwise total number of tweets in a bar chart
+Create a new column for quarter and compute quarter wise total number of tweets from each quarter
+Create a new column to identify the number of hashtags and compute device-wise average number of retweets
+Create a stacked bar chart to visualize month-wise total number of tweets from each device
+Create a scatter plot with the following details
+X axis contains number of retweets
+Y axis contains number of likes
+Color represents device from which it was tweeted
+Create a heat map or tile plot to visualize number of tweets by day of month and month of the year

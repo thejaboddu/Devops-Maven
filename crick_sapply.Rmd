@@ -1,0 +1,161 @@
+---
+title: "Cricket Dashboard"
+runtime: shiny
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+Sidebar {.sidebar}
+========================================
+
+```{r}
+fileInput(inputId = "metadata", label = "Please upload a CSV File")
+uiOutput("dropdown_columns")
+```
+
+EDA
+=======================================
+
+Row
+---------------------------------------
+
+### Preview the Data
+
+```{r}
+
+tableOutput("data_preview")
+
+```
+
+Row
+---------------------------------------
+### All columns
+```{r}
+tableOutput("columns")
+```
+
+### Numerical Columns
+```{r}
+tableOutput("numeric_columns")
+```
+
+### Categorical columns
+
+```{r}
+tableOutput("categorical_columns")
+```
+
+Numerical Columns
+=======================================
+Row {data-height=200}
+--------------------------------------
+
+### Dropdowns 
+```{r}
+uiOutput("dropdown_numerics")
+```
+Row
+-----------------------------
+```{r}
+plotOutput("scatter_plot")
+```
+
+
+
+Row
+----------------------------------
+### Histogram
+
+```{r}
+plotOutput("histogram")
+```
+
+
+### Boxplot
+
+```{r}
+plotOutput("boxplot")
+```
+
+
+Categorical Columns
+=======================================
+
+Row {data-height=300}
+--------------------------------------
+### Dropdowns 
+
+```{r}
+uiOutput("dropdown_categories")
+
+```
+
+
+Row 
+--------------------------------------
+
+### Frequency Distribution
+```{r}
+plotOutput("freq_category")
+```
+
+
+
+
+```{r}
+observe({
+  if(is.null(input$metadata))
+    return(NULL)
+  data = read.csv(input$metadata$datapath)
+  output$data_preview = renderTable(head(data))
+  
+  check_numeric =  sapply(data, is.numeric)
+  #Get Numeric
+  numeric_columns = names(data)[check_numeric]
+  numeric_column = names(data)[check_numeric]
+  #Get categorical columns
+   categorical_columns = names(data)[!check_numeric]
+    output$numeric_columns = renderTable(numeric_columns)
+  output$categorical_columns = renderTable(categorical_columns)
+  output$columns = renderTable(names(data))
+  output$dropdown_columns = renderUI({
+  selectInput(inputId = "select_column", label = 'Select a column', choices = names(data))
+  })
+  output$dropdown_numerics = renderUI({
+    selectInput(inputId = "select_numeric", label = "select a column", choices = 
+                  numeric_columns, multiple = TRUE,selected = numeric_columns[1])
+  })
+  output$dropdown_categories = renderUI({
+    selectInput(inputId = "select_category", label = "select a column",    
+                choices = categorical_columns)
+  })
+  output$boxplot = renderPlot({
+    boxplot(data[,input$select_numeric])
+  })
+  
+    output$histogram = renderPlot({
+   hist(data[,input$select_numeric])
+ 
+  })
+    output$freq_category = renderPlot({
+     items_freq = data %>% group_by_(input$select_category) %>% summarise(count_item=n()) %>% arrange(-count_item) %>% head(5) 
+      
+      ggplot(items_freq, aes_string(x=input$select_category, y='count_item')) + geom_bar(stat='identity')
+    })
+    output$scatter_plot = renderPlot({
+      ggplot(data,aes_string(x=input$select_numeric[1],y=input$select_numeric[2]))+ geom_point()
+    })
+    output$cluster_table = renderTable({
+      data_numerical = data[,numeric_column] 
+      fit = kmeans(na.omit(data_numerical),centers = 5)
+      table(fit$cluster)
+    })
+})
+```
+

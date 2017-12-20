@@ -1,0 +1,69 @@
+---
+title: "Cricket Dashboard"
+runtime: shiny
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+Sidebar {.sidebar}
+========================================
+
+```{r}
+fileInput(inputId = "metadata",label = "Please upload a CSV File")
+```
+
+EDA
+=======================================
+
+Row
+---------------------------------------
+
+### Preview the Data
+
+```{r}
+
+tableOutput("data_preview")
+
+```
+
+Column
+---------------------------------------
+### All columns
+```{r}
+textOutput("nrows")
+```
+
+### Numerical Columns
+```{r}
+textOutput("ncols")
+```
+
+### Categorical columns
+
+```{r}
+tableOutput("columns")
+```
+
+
+
+```{r}
+observe({
+  if(is.null(input$metadata))
+    return(NULL)
+  data(read.csv = input$metadata$datapath)
+  output$data_preview = renderTable(head(data))
+  output$nrows = renderText(nrow(data))
+  output$ncols = renderText(length(names(data)))
+  output$columns = renderTable(names(data))
+})
+
+```
+
+
+

@@ -1,0 +1,46 @@
+---
+title: "DV_Charts"
+author: "Theja"
+date: "30 November 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(gganimate)
+library(dplyr)
+library(devtools)
+library(animation)
+library(gapminder)
+library(ggplot2)
+```
+
+```{r}
+odi <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/2 Data Visualization/odi.csv")
+
+```
+
+```{r}
+players <- c('Sachin R Tendulkar','Rahul Dravid','Ashish Nehra')
+odi_subset <- odi %>% filter(Player %in% players)
+Sys.setenv(PATH=paste("C:/Program Files/ImageMagick-7.0.7-Q16/",Sys.getenv("PATH"),sep=";"))
+unique(odi_subset$Player)
+magicpath <- shortPathName("C:/Program Files/ImageMagick-7.0.7-Q16/magick.exe")
+ani.options(convert = magicpath)
+g = ggplot(odi_subset,aes(x=Runs,y=ScoreRate,frame=Player)) + geom_point()
+gganimate(g)
+```
+
+```{r}
+View(gapminder)
+p <- ggplot(gapminder,aes(x=gdpPercap,y = lifeExp,size = pop,color = continent ,frame = year)) + geom_point() + scale_x_log10()
+
+gganimate(p,"output.gif")
+
+```
+
+
+
