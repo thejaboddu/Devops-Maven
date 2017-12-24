@@ -1,0 +1,23 @@
+1. Column types - Categories/Dimension/Groups/Qualitative , Numerics/Metric/Quantitative, Dates, Location, Text
+2. Granularity of data
+3. Derive new metrics
+	- Numerical column: Bin it
+	- Text - No. of characters, words, sentences, hashtags, frequency of particular word
+	- Date - Year, month, day, hour, second, evening/morning, weekday/holiday, Seasons
+	- Location- Latitude, longitude, State, Country, Avg temperature, Population, GDP
+4. Univariate Analysis
+	- Dimension - Frequenct Count - Bar chart
+	- Numerical - Distribution
+			- Histogram, Boxplot (Outliers, skewness, distribution)
+        - Text - Create word cloud to understand what are frequently used words
+	- Date - Consider it is a dimension
+5. Bivariate Analysis
+	- 1 Dimension + 1 Metric - Barchart, x-axis(Dimension), y-axis(Metric), Summarize(Min, max, mean, median, Sum)
+	- 2 Dimension: Heat Map (Color represents the frequency)
+	- 2 Metric: Scatterplot (Outliers, Visual Grouping, Trend, Correlation)
+
+6. Multivariate Analysis
+	- 1 Dimension & 2 Metrics - Treemap (Size is metric, color is another metric, boxes for dimension)
+                                  - Colored bar chart(bars for dimension, yaxis-metric, color-metric)
+	- 2 Dimension & 2 Metrics - Scatter plot (Xaxis-metric, yaxis-metric, color-dimension,  symbol-dimension)
+	- Many metrics - Scatter plot (xaxis, yaxis, color, size)
